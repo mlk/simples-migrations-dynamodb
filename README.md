@@ -1,5 +1,9 @@
-simples-migrations
+simples-migrations-dynamodb
 =================
 
-A base for a Spring Boot based migrations-as-code process.
-A poor-mans [Flyway](https://flywaydb.org/) for random chunks of Java code.
+A poor-mans [Flyway](https://flywaydb.org/) for [dynamodb](https://aws.amazon.com/dynamodb).
+
+To use first add the `@EnableSimplesDynamoMigration` annotation to your
+[Spring Boot](https://projects.spring.io/spring-boot/) app. Then create a bunch
+of beans that implement `Migration`.
+See the `SimplesApp` for an example.
