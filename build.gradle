@@ -44,20 +44,6 @@ signing {
     sign configurations.archives
 }
 
-task copyNativeDeps(type: Copy) {
-    from(configurations.compile + configurations.testCompile) {
-        include '*.dll'
-        include '*.dylib'
-        include '*.so'
-    }
-    into 'build/libs'
-}
-
-test {
-    dependsOn copyNativeDeps
-    systemProperty "java.library.path", 'build/libs'
-}
-
 dependencies {
     compile 'com.github.mlk:simples-migrations:1.0.2'
     compile 'com.amazonaws:aws-java-sdk-dynamodb:1.11.125'
