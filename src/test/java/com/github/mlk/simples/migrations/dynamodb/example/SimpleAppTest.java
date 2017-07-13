@@ -4,9 +4,10 @@ import static org.assertj.core.api.Java6Assertions.assertThat;
 import static org.junit.Assert.fail;
 
 import com.amazonaws.AmazonServiceException;
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
 import com.amazonaws.services.dynamodbv2.model.DescribeTableRequest;
 import com.amazonaws.services.dynamodbv2.model.DescribeTableResult;
-import com.github.mlk.simples.migrations.dynamodb.AlternatorDBRule;
+import com.github.mlk.simples.migrations.dynamodb.LocalHttpDynamoDbRule;
 import org.assertj.core.api.Assertions;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -35,10 +36,13 @@ public class SimpleAppTest {
   @Autowired
   Environment environment;
 
+  @Autowired
+  AmazonDynamoDBClient client;
+
   // The Spring context gets created once for all the tests, so we need to have just a single
   // fake DynamoDB for all the tests
   @ClassRule
-  public static AlternatorDBRule alternatorDBRule = new AlternatorDBRule();
+  public static LocalHttpDynamoDbRule localDynamoDbRole = new LocalHttpDynamoDbRule();
 
   public String getManagementPath() {
     final int managementPort = environment.getProperty("local.management.port", Integer.class);
@@ -62,7 +66,7 @@ public class SimpleAppTest {
     // NOTE: The magic happens as part of Spring startup
 
     try {
-      DescribeTableResult migrationsTable = alternatorDBRule.getClient()
+      DescribeTableResult migrationsTable = client
           .describeTable(new DescribeTableRequest().withTableName("people"));
 
       Assertions.assertThat(migrationsTable.getTable().getTableName()).isEqualTo("people");

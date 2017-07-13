@@ -14,16 +14,16 @@ import org.junit.Test;
 
 public class DynamoCheckMigrationTest {
   @Rule
-  public AlternatorDBRule alternatorDBRule = new AlternatorDBRule();
+  public LocalDynamoDbRole localDynamoDbRole = new LocalDynamoDbRole();
 
   @Test
   public void whenTableDoesNotExistThenCreateIt() {
-    DynamoCheckMigration underTest = new DynamoCheckMigration(alternatorDBRule.getClient());
+    DynamoCheckMigration underTest = new DynamoCheckMigration(localDynamoDbRole.getClient());
 
     underTest.setup();
 
     try {
-      DescribeTableResult migrationsTable = alternatorDBRule.getClient()
+      DescribeTableResult migrationsTable = localDynamoDbRole.getClient()
           .describeTable(new DescribeTableRequest().withTableName("migrations"));
 
       assertThat(migrationsTable.getTable().getTableName()).isEqualTo("migrations");
@@ -34,14 +34,14 @@ public class DynamoCheckMigrationTest {
 
   @Test
   public void whenTablesDoesExistDontBlowUp() {
-    DynamoCheckMigration underTest = new DynamoCheckMigration(alternatorDBRule.getClient());
+    DynamoCheckMigration underTest = new DynamoCheckMigration(localDynamoDbRole.getClient());
 
     underTest.setup();
 
     underTest.setup();
 
     try {
-      DescribeTableResult migrationsTable = alternatorDBRule.getClient()
+      DescribeTableResult migrationsTable = localDynamoDbRole.getClient()
           .describeTable(new DescribeTableRequest().withTableName("migrations"));
 
       assertThat(migrationsTable.getTable().getTableName()).isEqualTo("migrations");
@@ -52,7 +52,7 @@ public class DynamoCheckMigrationTest {
 
   @Test
   public void whenMigrationHasNotRunThenReturnFalse() {
-    DynamoCheckMigration underTest = new DynamoCheckMigration(alternatorDBRule.getClient());
+    DynamoCheckMigration underTest = new DynamoCheckMigration(localDynamoDbRole.getClient());
 
     underTest.setup();
 
@@ -62,7 +62,7 @@ public class DynamoCheckMigrationTest {
 
   @Test
   public void whenMigrationHasRunThenReturnTrue() {
-    DynamoCheckMigration underTest = new DynamoCheckMigration(alternatorDBRule.getClient());
+    DynamoCheckMigration underTest = new DynamoCheckMigration(localDynamoDbRole.getClient());
 
     underTest.setup();
 

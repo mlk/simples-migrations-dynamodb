@@ -21,6 +21,9 @@ sourceCompatibility = 1.8
 
 repositories {
     mavenCentral()
+    maven {
+        url = "https://s3-us-west-2.amazonaws.com/dynamodb-local/release"
+    }
 }
 
 task javadocJar(type: Jar) {
@@ -41,21 +44,34 @@ signing {
     sign configurations.archives
 }
 
+task copyNativeDeps(type: Copy) {
+    from(configurations.compile + configurations.testCompile) {
+        include '*.dll'
+        include '*.dylib'
+        include '*.so'
+    }
+    into 'build/libs'
+}
+
+test {
+    dependsOn copyNativeDeps
+    systemProperty "java.library.path", 'build/libs'
+}
 
 dependencies {
     compile 'com.github.mlk:simples-migrations:1.0.2'
-    compile 'com.amazonaws:aws-java-sdk-dynamodb:1.10.5.1'
-    compile 'com.amazonaws:aws-java-sdk-core:1.10.5.1'
+    compile 'com.amazonaws:aws-java-sdk-dynamodb:1.11.125'
 
     compileOnly 'org.projectlombok:lombok:1.16.16'
 
     testCompile 'org.assertj:assertj-core:3.6.2'
     testCompile 'org.springframework.boot:spring-boot-starter-test:1.5.3.RELEASE'
-    testCompile 'com.michelboudreau:alternator:0.12.0'
     testCompile 'org.springframework.boot:spring-boot-starter-web:1.5.3.RELEASE'
     testCompile 'org.springframework.boot:spring-boot-starter-actuator:1.5.3.RELEASE'
     testCompile 'org.springframework.boot:spring-boot-starter-undertow:1.5.3.RELEASE'
     testCompile 'org.apache.httpcomponents:httpclient:4.5.3'
+
+    testCompile 'com.amazonaws:DynamoDBLocal:1.11.0.1'
 }
 
 uploadArchives {
