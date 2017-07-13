@@ -6,6 +6,7 @@ import static org.junit.Assert.fail;
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.dynamodbv2.model.DescribeTableRequest;
 import com.amazonaws.services.dynamodbv2.model.DescribeTableResult;
+import com.github.mlk.junit.rules.LocalDynamoDbRule;
 import java.util.UUID;
 import org.junit.Rule;
 import org.junit.Test;
@@ -14,7 +15,7 @@ import org.junit.Test;
 
 public class DynamoCheckMigrationTest {
   @Rule
-  public LocalDynamoDbRole localDynamoDbRole = new LocalDynamoDbRole();
+  public LocalDynamoDbRule localDynamoDbRole = new LocalDynamoDbRule();
 
   @Test
   public void whenTableDoesNotExistThenCreateIt() {

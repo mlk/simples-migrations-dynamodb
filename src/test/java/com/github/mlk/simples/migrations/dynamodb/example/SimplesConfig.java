@@ -13,14 +13,22 @@ import org.springframework.validation.annotation.Validated;
 @ConfigurationProperties(prefix = "application")
 public class SimplesConfig {
 
-  // This should create either a real one or a test one via @Profile/@ActiveProfile/Configuration magic.
-  // But we are only using this in test, so I only worry about the test implementation
+  private String endpoint;
+
+  public void setEndpoint(String endpoint) {
+    this.endpoint = endpoint;
+  }
+
+  public String getEndpoint() {
+    return endpoint;
+  }
+
   @Bean
   public AmazonDynamoDB create() {
 
     return AmazonDynamoDBClientBuilder.standard().withEndpointConfiguration(
         // we can use any region here
-        new AwsClientBuilder.EndpointConfiguration("http://localhost:" + System.getProperty("aws.dynamodb.port"), "us-west-2"))
+        new AwsClientBuilder.EndpointConfiguration(getEndpoint(), "us-west-2"))
         .withCredentials(new AWSStaticCredentialsProvider(new BasicAWSCredentials("x", "x")))
         .build();
 
