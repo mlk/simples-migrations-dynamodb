@@ -15,9 +15,10 @@ public class SimplesConfig {
   // But we are only using this in test, so I only worry about the test implementation
   @Bean
   public AmazonDynamoDB create() {
+
     return AmazonDynamoDBClientBuilder.standard().withEndpointConfiguration(
         // we can use any region here
-        new AwsClientBuilder.EndpointConfiguration("http://localhost:8000", "us-west-2"))
+        new AwsClientBuilder.EndpointConfiguration("http://localhost:" + System.getProperty("aws.dynamodb.port"), "us-west-2"))
         .build();
 
   }
