@@ -1,5 +1,7 @@
 package com.github.mlk.simples.migrations.dynamodb.example;
 
+import com.amazonaws.auth.AWSStaticCredentialsProvider;
+import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
@@ -19,6 +21,7 @@ public class SimplesConfig {
     return AmazonDynamoDBClientBuilder.standard().withEndpointConfiguration(
         // we can use any region here
         new AwsClientBuilder.EndpointConfiguration("http://localhost:" + System.getProperty("aws.dynamodb.port"), "us-west-2"))
+        .withCredentials(new AWSStaticCredentialsProvider(new BasicAWSCredentials("x", "x")))
         .build();
 
   }
