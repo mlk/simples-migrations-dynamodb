@@ -2,6 +2,8 @@ package com.github.mlk.simples.migrations.dynamodb;
 
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
+import com.amazonaws.services.dynamodbv2.document.DynamoDB;
+import com.amazonaws.services.dynamodbv2.document.Table;
 import com.amazonaws.services.dynamodbv2.model.AttributeDefinition;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.dynamodbv2.model.CreateTableRequest;
@@ -32,9 +34,12 @@ public class DynamoCheckMigration implements CheckMigration {
 
   @Override
   public void setup() {
+    DynamoDB db = new DynamoDB(client);
+
     List<KeySchemaElement> keySchema = new ArrayList<>();
 
-    AttributeDefinition attributeDefinition = new AttributeDefinition("script", ScalarAttributeType.S);
+    AttributeDefinition attributeDefinition = new AttributeDefinition("script",
+        ScalarAttributeType.S);
 
     keySchema.add(
         new KeySchemaElement()
@@ -53,9 +58,11 @@ public class DynamoCheckMigration implements CheckMigration {
         .withProvisionedThroughput(provisionedThroughput);
 
     try {
-      client.createTable(request);
-    } catch (AmazonClientException e) {
+      Table result = db.createTable(request);
+      result.waitForActive();
+    } catch (AmazonClientException | InterruptedException e) {
       log.debug("yummy exception", e);
+
     }
   }
 

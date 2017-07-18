@@ -4,9 +4,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
 import com.amazonaws.AmazonServiceException;
+import com.amazonaws.client.builder.AwsClientBuilder;
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
 import com.amazonaws.services.dynamodbv2.model.DescribeTableRequest;
 import com.amazonaws.services.dynamodbv2.model.DescribeTableResult;
-import com.github.mlk.junit.rules.LocalDynamoDbRule;
+import com.github.mlk.junit.rules.HttpDynamoDbRule;
 import java.util.UUID;
 import org.junit.Rule;
 import org.junit.Test;
@@ -15,16 +18,23 @@ import org.junit.Test;
 
 public class DynamoCheckMigrationTest {
   @Rule
-  public LocalDynamoDbRule localDynamoDbRole = new LocalDynamoDbRule();
+  public HttpDynamoDbRule localDynamoDbRole = new HttpDynamoDbRule();
+
+  public AmazonDynamoDB getClient() {
+    return AmazonDynamoDBClientBuilder.standard().withEndpointConfiguration(
+        // we can use any region here
+        new AwsClientBuilder.EndpointConfiguration(localDynamoDbRole.getEndpoint(), "us-west-2"))
+        .build();
+  }
 
   @Test
   public void whenTableDoesNotExistThenCreateIt() {
-    DynamoCheckMigration underTest = new DynamoCheckMigration(localDynamoDbRole.getClient());
+    DynamoCheckMigration underTest = new DynamoCheckMigration(getClient());
 
     underTest.setup();
 
     try {
-      DescribeTableResult migrationsTable = localDynamoDbRole.getClient()
+      DescribeTableResult migrationsTable = getClient()
           .describeTable(new DescribeTableRequest().withTableName("migrations"));
 
       assertThat(migrationsTable.getTable().getTableName()).isEqualTo("migrations");
@@ -35,14 +45,14 @@ public class DynamoCheckMigrationTest {
 
   @Test
   public void whenTablesDoesExistDontBlowUp() {
-    DynamoCheckMigration underTest = new DynamoCheckMigration(localDynamoDbRole.getClient());
+    DynamoCheckMigration underTest = new DynamoCheckMigration(getClient());
 
     underTest.setup();
 
     underTest.setup();
 
     try {
-      DescribeTableResult migrationsTable = localDynamoDbRole.getClient()
+      DescribeTableResult migrationsTable = getClient()
           .describeTable(new DescribeTableRequest().withTableName("migrations"));
 
       assertThat(migrationsTable.getTable().getTableName()).isEqualTo("migrations");
@@ -53,7 +63,7 @@ public class DynamoCheckMigrationTest {
 
   @Test
   public void whenMigrationHasNotRunThenReturnFalse() {
-    DynamoCheckMigration underTest = new DynamoCheckMigration(localDynamoDbRole.getClient());
+    DynamoCheckMigration underTest = new DynamoCheckMigration(getClient());
 
     underTest.setup();
 
@@ -63,7 +73,7 @@ public class DynamoCheckMigrationTest {
 
   @Test
   public void whenMigrationHasRunThenReturnTrue() {
-    DynamoCheckMigration underTest = new DynamoCheckMigration(localDynamoDbRole.getClient());
+    DynamoCheckMigration underTest = new DynamoCheckMigration(getClient());
 
     underTest.setup();
 
