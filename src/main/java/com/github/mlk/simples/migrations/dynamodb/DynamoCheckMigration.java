@@ -62,7 +62,6 @@ public class DynamoCheckMigration implements CheckMigration {
       result.waitForActive();
     } catch (AmazonClientException | InterruptedException e) {
       log.debug("yummy exception", e);
-
     }
   }
 
